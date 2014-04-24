@@ -1,4 +1,2 @@
-WisePushJavascriptSDK
-=====================
-
 wisepush javascript SDK
+=====================
