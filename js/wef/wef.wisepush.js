@@ -14,7 +14,9 @@ WEF.wisepush = {
     subscriptions: [],
     messages: [],
     connected: false,
-
+    /**
+     * 네크워크 단절 등 네트워크 연결이 끊어진다음 재 연결되었을 경우 Wisepush 재연결 처리하는 함수.
+     */
     reconnect : function() {
         this.client = null;
         //WEF.Alert.reset();
@@ -22,6 +24,9 @@ WEF.wisepush = {
         //WEF.wisepush.renderClearForm($('form#subForm'));
         WEF.wisepush.connect();
     },
+    /**
+     * 최초 페이지 로딩 시 wisepush 서버 접속 처리 함수.
+     */
     connect : function() {
         var host = 'wiseeco.com', port = 8083, clientId = 'clientId-' + WEF.func.randomString(10);
         this.client = new Messaging.Client(host, port, clientId);
@@ -38,11 +43,17 @@ WEF.wisepush = {
         };
         this.client.connect(options);
     },
+    /**
+     * 연결 실패시 호출되는 콜백 함수.
+     */
     onFail : function (message) {
         WEF.wisepush.connected = false;
         //WEF.Alert.error("STATE : disconnected.");
         WEF.wisepush.reconnect();
     },
+    /**
+     * 연결 단절 시 호출되는 콜백 함수.
+     */
     onConnectionLost : function (responseObject) {
         WEF.wisepush.connected = false;
         if (responseObject.errorCode !== 0) {
@@ -58,6 +69,9 @@ WEF.wisepush = {
         //this.subscriptions = [];
         //WEF.wisepush.renderClearSubscriptions();
     },
+    /**
+     * 메세지 수신 시 호출되는 콜백 함수.
+     */
     onMessageArrived : function (message) {
         var subscription = WEF.wisepush.getSubscriptionForTopic(message.destinationName);
         var messageObj = {
@@ -73,6 +87,9 @@ WEF.wisepush = {
         messageObj.id = WEF.wisepush.renderMessage(messageObj);
         WEF.wisepush.messages.push(messageObj);
     },
+    /**
+     * 정상 연결 시 호출되는 콜백 함수.
+     */
     onConnect : function () {
         WEF.wisepush.connected = true;
         //WEF.Alert.success("STATE : wiseeco.com connection succeeded.");
@@ -84,9 +101,15 @@ WEF.wisepush = {
             });
         }
     },
+    /**
+     * wisepush 서버와 연결 해제.
+     */
     disconnect : function () {
         this.client.disconnect();
     },
+    /**
+     * wisepush 서버에 메세지 발송.
+     */
     publish : function (topic, payload, qos, retain) {
         if (!WEF.wisepush.connected) {
             WEF.Alert.error("STATE : disconnected.");
@@ -100,6 +123,9 @@ WEF.wisepush = {
         this.client.send(message);
         //WEF.wisepush.renderPublish(topic);
     },
+    /**
+     * 메세지(토픽 포함) 구독 요청.
+     */
     subscribe : function (topic) {
         if (!WEF.wisepush.connected) {
             //WEF.Alert.error("STATE : disconnected.");
@@ -118,6 +144,9 @@ WEF.wisepush = {
         console.log(subscription);
         return true;
     },
+    /**
+     * 메세지(토픽 포함) 구독 해제 요청.
+     */
     unsubscribe : function (id) {
         var subs = _.find(WEF.wisepush.subscriptions, {'id': id});
         this.client.unsubscribe(subs.topic);
