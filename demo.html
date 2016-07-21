@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>MQTT Demo</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Script-Type" content="text/javascript" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="js/jquery/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="js/jquery/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="js/jquery/jquery.validate.extends.js"></script>
+    <script type="text/javascript" src="js/moment/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="js/underscore/underscore-min.js"></script>
+    <script type="text/javascript" src="js/wef/mqttws31.js"></script>
+    <script type="text/javascript" src="js/wef/wef.function.js"></script>
+    <script type="text/javascript" src="js/wef/wef.wisepush.js"></script>
+</head>
+<body>
+    <div id="lJStest" class="tab-pane active well">
+        <!-- js pub/sub test -->
+        <h3>MQTT 시뮬레이션</h3>
+        <div class="row-fluid">
+            <div id="alert-container">
+                <div class="alert alert-success hide">
+                    <span class="alert-message">success</span>
+                </div>
+                <div class="alert alert-error hide">
+                    <span class="alert-message">fail</span>
+                </div>
+                <div class="alert alert-info hide">
+                    <span class="alert-message">info</span>
+                </div>
+            </div>
+        </div>
+        <div class="row-fluid">
+            <div class="widget span5">
+                <div class="widget-header">
+                    <i class="icon-plane"></i><h3>Subscribe to Topics</h3>
+                </div>
+                <!-- /widget-header -->
+                <div class="widget-content">
+                    <form class="stat" id="subForm" style="margin:10px;">
+                        <div class="control-group">
+                            <label class="control-label" for="subtopic">Topics</label>
+                            <div class="controls">
+                                <input type="text" name="topic" class="span6" id="subtopic" value="">
+                            </div>
+                        </div>
+                        <div>
+                            <input class="btn btn-primary" type="button" value="Subscribe" id="subscribe-btn">
+                        </div>
+                        <br/>
+                        <pre id="message-data" class="alert-info pre-scrollable" style="height:64px;max-height:64px;"></pre>
+                    </form>
+                </div>
+                <!-- /widget-content -->
+            </div>
+        </div>
+        <hr/>
+        <div class="row-fluid">
+            <div class="widget span5">
+                <div class="widget-header">
+                    <i class="icon-plane"></i><h3>Topic Publish</h3>
+                </div>
+                <!-- /widget-header -->
+                <div class="widget-content">
+                    <form class="stat" id="pubForm" style="margin:10px;">
+                        <div class="control-group">
+                            <label class="control-label" for="pubtopic">Topics</label>
+                            <div class="controls">
+                                <input type="text" name="topic" class="span6" id="pubtopic" value="">
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="payload">Publish Messages</label>
+                            <div class="controls">
+                                <textarea name="payload" id="payload" rows="3" cols="400" style="width:95%;"></textarea>
+                            </div>
+                        </div>
+                        <div>
+                            <input class="btn btn-success" type="button" value="Publish" id="publish-btn">
+                        </div>
+                    </form>
+                </div>
+                <!-- /widget-content -->
+            </div>
+            <!-- /widget -->
+        </div>
+        <!-- /js pub/sub test -->
+    </div>
+
+    <script type="text/javascript">
+//<![CDATA[
+var _timer;
+
+$(function() {
+    WEF.wisepush.connect();
+
+    $("input#subscribe-btn").click(function(){
+        var $f = $('form#subForm');
+        if($f.valid()) {
+            var $subtopic = $f.find("input#subtopic");
+            WEF.wisepush.subscribe($subtopic.val());
+        }
+    });
+
+    $("input#publish-btn").click(function(){
+        var $f = $('form#pubForm');
+        if($f.valid()) {
+            var $pubtopic = $f.find("input#pubtopic");
+            var $payload = $f.find("textarea#payload");
+            WEF.wisepush.publish($pubtopic.val(), $payload.val(), 0, false);
+        }
+    });
+
+    $('form#subForm, form#pubForm').each(function(i, form){
+        var $f = $(form);
+        $f.validate({
+            rules: {
+                topic : {
+                    required: true,
+                    regex : /^[\w\d\/\+\#]+$/
+                },
+                payload : {
+                    required: true
+                }
+            },
+            messages : {
+                topic : {
+                    required : $.format("! 토픽을 입력해주세요."),
+                    regex : $.format("! 토픽 네이밍을 확인해주세요.")
+                },
+                payload : {
+                    required : $.format("! 발행할 메시지를 입력해주세요.")
+                }
+            },
+            highlight: function(element) {
+                $(element).closest('.control-group')
+                    .removeClass('success').addClass('error');
+            },
+            success: function(element) {
+                $(element).closest('.control-group')
+                    .removeClass('error').addClass('success');
+            },
+            submitHandler: function(form) {
+                return false; // 엔터 서브밋 방지
+            }
+        });
+    });
+});
+//]]>
+</script>
+</body>
+</html>

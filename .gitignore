@@ -1,0 +1,15 @@
+.settings
+.classpath
+.project
+.idea/
+*.iml
+.DS_Store
+bin/
+classes/
+lib/
+target/
+node_modules/
+bower_components/
+src/main/resources/rebel.xml
+temporary
+*.bak
