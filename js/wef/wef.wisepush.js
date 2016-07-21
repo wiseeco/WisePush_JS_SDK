@@ -18,8 +18,8 @@ WEF.wisepush = {
     reconnect : function() {
         this.client = null;
         //WEF.Alert.reset();
-        WEF.wisepush.renderClearForm($('form#pubForm'));
-        WEF.wisepush.renderClearForm($('form#subForm'));
+        //WEF.wisepush.renderClearForm($('form#pubForm'));
+        //WEF.wisepush.renderClearForm($('form#subForm'));
         WEF.wisepush.connect();
     },
     connect : function() {
@@ -40,7 +40,7 @@ WEF.wisepush = {
     },
     onFail : function (message) {
         WEF.wisepush.connected = false;
-        WEF.Alert.error("STATE : disconnected.");
+        //WEF.Alert.error("STATE : disconnected.");
         WEF.wisepush.reconnect();
     },
     onConnectionLost : function (responseObject) {
@@ -48,7 +48,7 @@ WEF.wisepush = {
         if (responseObject.errorCode !== 0) {
             console.log("onConnectionLost:" + responseObject.errorMessage);
         }
-        WEF.Alert.error("STATE : disconnected.");
+        //WEF.Alert.error("STATE : disconnected.");
         WEF.wisepush.reconnect()
         //this.client = null;
         //Cleanup messages
@@ -69,13 +69,14 @@ WEF.wisepush = {
             'subscriptionId': subscription.id
         };
 
-        //console.log(messageObj);
+        console.log(messageObj);
         messageObj.id = WEF.wisepush.renderMessage(messageObj);
         WEF.wisepush.messages.push(messageObj);
     },
     onConnect : function () {
         WEF.wisepush.connected = true;
-        WEF.Alert.success("STATE : wiseeco.com connection succeeded.");
+        //WEF.Alert.success("STATE : wiseeco.com connection succeeded.");
+        console.log('wiseeco.com connection succeeded.');
         if (WEF.wisepush.subscriptions && WEF.wisepush.subscriptions.length > 0) {
             _.each(WEF.wisepush.subscriptions, function(ele, index) {
                 WEF.wisepush.subscriptions.splice(index, 1);
@@ -97,31 +98,24 @@ WEF.wisepush = {
         message.qos = qos;
         message.retained = retain;
         this.client.send(message);
-        WEF.wisepush.renderPublish(topic);
+        //WEF.wisepush.renderPublish(topic);
     },
     subscribe : function (topic) {
         if (!WEF.wisepush.connected) {
-            WEF.Alert.error("STATE : disconnected.");
+            //WEF.Alert.error("STATE : disconnected.");
             console.log('disconnected.');
             return false;
         }
         if (topic.length < 1) {
-            WEF.Alert.error("Topic cannot be empty.");
+            //WEF.Alert.error("Topic cannot be empty.");
             console.log('Topic cannot be empty.');
             return false;
         }
-        //var alreadyTopic = _.find(this.subscriptions, function(sub) {
-        //    return sub.topic == topic;
-        //});
-        //if (alreadyTopic) {
-        //    WEF.Alert.error("You are already subscribed to this topic.");
-        //    console.log('You are already subscribed to this topic.' + topic);
-        //    return false;
-        //}
         this.client.subscribe(topic, {qos: 0});
         var subscription = {'topic': topic, 'qos': 0};
         subscription.id = WEF.wisepush.renderSubscription(subscription);
         this.subscriptions.push(subscription);
+        console.log(subscription);
         return true;
     },
     unsubscribe : function (id) {
@@ -166,10 +160,10 @@ WEF.wisepush = {
         });
     },
     renderSubscription : function (subscription) {
-        WEF.Alert.reset();
-        WEF.Alert.success(subscription.topic + " 구독되었습니다.");
-        WEF.wisepush.renderClearForm($('form#subForm'));
-        WEF.wisepush.renderClearSubscriptions();
+        //WEF.Alert.reset();
+        //WEF.Alert.success(subscription.topic + " 구독되었습니다.");
+        //WEF.wisepush.renderClearForm($('form#subForm'));
+        //WEF.wisepush.renderClearSubscriptions();
         return WEF.wisepush.lastSubId++;
     },
     renderRemoveSubscriptionsMessages : function (id) {

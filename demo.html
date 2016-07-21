@@ -22,19 +22,6 @@
         <!-- js pub/sub test -->
         <h3>MQTT 시뮬레이션</h3>
         <div class="row-fluid">
-            <div id="alert-container">
-                <div class="alert alert-success hide">
-                    <span class="alert-message">success</span>
-                </div>
-                <div class="alert alert-error hide">
-                    <span class="alert-message">fail</span>
-                </div>
-                <div class="alert alert-info hide">
-                    <span class="alert-message">info</span>
-                </div>
-            </div>
-        </div>
-        <div class="row-fluid">
             <div class="widget span5">
                 <div class="widget-header">
                     <i class="icon-plane"></i><h3>Subscribe to Topics</h3>
@@ -90,67 +77,66 @@
         </div>
         <!-- /js pub/sub test -->
     </div>
-
     <script type="text/javascript">
-//<![CDATA[
-var _timer;
+    //<![CDATA[
+    var _timer;
 
-$(function() {
-    WEF.wisepush.connect();
+    $(function() {
+        WEF.wisepush.connect();
 
-    $("input#subscribe-btn").click(function(){
-        var $f = $('form#subForm');
-        if($f.valid()) {
-            var $subtopic = $f.find("input#subtopic");
-            WEF.wisepush.subscribe($subtopic.val());
-        }
-    });
-
-    $("input#publish-btn").click(function(){
-        var $f = $('form#pubForm');
-        if($f.valid()) {
-            var $pubtopic = $f.find("input#pubtopic");
-            var $payload = $f.find("textarea#payload");
-            WEF.wisepush.publish($pubtopic.val(), $payload.val(), 0, false);
-        }
-    });
-
-    $('form#subForm, form#pubForm').each(function(i, form){
-        var $f = $(form);
-        $f.validate({
-            rules: {
-                topic : {
-                    required: true,
-                    regex : /^[\w\d\/\+\#]+$/
-                },
-                payload : {
-                    required: true
-                }
-            },
-            messages : {
-                topic : {
-                    required : $.format("! 토픽을 입력해주세요."),
-                    regex : $.format("! 토픽 네이밍을 확인해주세요.")
-                },
-                payload : {
-                    required : $.format("! 발행할 메시지를 입력해주세요.")
-                }
-            },
-            highlight: function(element) {
-                $(element).closest('.control-group')
-                    .removeClass('success').addClass('error');
-            },
-            success: function(element) {
-                $(element).closest('.control-group')
-                    .removeClass('error').addClass('success');
-            },
-            submitHandler: function(form) {
-                return false; // 엔터 서브밋 방지
+        $("input#subscribe-btn").click(function(){
+            var $f = $('form#subForm');
+            if($f.valid()) {
+                var $subtopic = $f.find("input#subtopic");
+                WEF.wisepush.subscribe($subtopic.val());
             }
         });
+
+        $("input#publish-btn").click(function(){
+            var $f = $('form#pubForm');
+            if($f.valid()) {
+                var $pubtopic = $f.find("input#pubtopic");
+                var $payload = $f.find("textarea#payload");
+                WEF.wisepush.publish($pubtopic.val(), $payload.val(), 0, false);
+            }
+        });
+
+        $('form#subForm, form#pubForm').each(function(i, form){
+            var $f = $(form);
+            $f.validate({
+                rules: {
+                    topic : {
+                        required: true,
+                        regex : /^[\w\d\/\+\#]+$/
+                    },
+                    payload : {
+                        required: true
+                    }
+                },
+                messages : {
+                    topic : {
+                        required : $.format("! 토픽을 입력해주세요."),
+                        regex : $.format("! 토픽 네이밍을 확인해주세요.")
+                    },
+                    payload : {
+                        required : $.format("! 발행할 메시지를 입력해주세요.")
+                    }
+                },
+                highlight: function(element) {
+                    $(element).closest('.control-group')
+                        .removeClass('success').addClass('error');
+                },
+                success: function(element) {
+                    $(element).closest('.control-group')
+                        .removeClass('error').addClass('success');
+                },
+                submitHandler: function(form) {
+                    return false; // 엔터 서브밋 방지
+                }
+            });
+        });
     });
-});
-//]]>
+    //]]>
 </script>
 </body>
 </html>
