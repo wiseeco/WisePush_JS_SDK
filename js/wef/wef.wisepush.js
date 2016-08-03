@@ -28,8 +28,8 @@ WEF.wisepush = {
      * 최초 페이지 로딩 시 wisepush 서버 접속 처리 함수.
      */
     connect : function() {
-        var host = 'wiseeco.com', port = 8083, clientId = 'clientId-' + WEF.func.randomString(10);
-        this.client = new Messaging.Client(host, port, clientId);
+        var host = 'www.wiseeco.com', port = 8083, clientId = 'clientId-' + WEF.func.randomString(10);
+        this.client = new Paho.MQTT.Client(host, port, clientId);
         this.client.onConnectionLost = this.onConnectionLost;
         this.client.onMessageArrived = this.onMessageArrived;
         this.client.onConnect = this.onConnect;
@@ -82,8 +82,7 @@ WEF.wisepush = {
             'timestamp': moment(),
             'subscriptionId': subscription.id
         };
-
-        console.log(messageObj);
+        console.log(message);
         messageObj.id = WEF.wisepush.renderMessage(messageObj);
         WEF.wisepush.messages.push(messageObj);
     },
@@ -115,8 +114,7 @@ WEF.wisepush = {
             WEF.Alert.error("STATE : disconnected.");
             return false;
         }
-
-        var message = new Messaging.Message(payload);
+        var message = new Paho.MQTT.Message(payload);
         message.destinationName = topic;
         message.qos = qos;
         message.retained = retain;
@@ -137,8 +135,8 @@ WEF.wisepush = {
             console.log('Topic cannot be empty.');
             return false;
         }
-        this.client.subscribe(topic, {qos: 0});
-        var subscription = {'topic': topic, 'qos': 0};
+        this.client.subscribe(topic, {qos: 1});
+        var subscription = {'topic': topic, 'qos': 1};
         subscription.id = WEF.wisepush.renderSubscription(subscription);
         this.subscriptions.push(subscription);
         console.log(subscription);
@@ -153,7 +151,6 @@ WEF.wisepush = {
         WEF.wisepush.subscriptions = _.filter(WEF.wisepush.subscriptions, function (item) {
             return item.id != id;
         });
-
         WEF.wisepush.renderRemoveSubscriptionsMessages(id);
     },
     getSubscriptionForTopic : function (topic) {
