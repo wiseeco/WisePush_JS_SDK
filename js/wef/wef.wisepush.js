@@ -25,7 +25,7 @@ WEF.wisepush = {
      * 최초 페이지 로딩 시 wisepush 서버 접속 처리 함수.
      */
     connect : function() {
-        var host = 'localhost', port = 8083, clientId = 'clientId-' + WEF.func.randomString(10);
+        var host = 'www.wiseeco.com', port = 8083, clientId = 'clientId-' + WEF.func.randomString(10);
         this.client = new Paho.MQTT.Client(host, port, clientId);
         this.client.onConnectionLost = this.onConnectionLost;
         this.client.onMessageArrived = this.onMessageArrived;
