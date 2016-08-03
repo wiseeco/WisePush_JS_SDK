@@ -19,16 +19,13 @@ WEF.wisepush = {
      */
     reconnect : function() {
         this.client = null;
-        //WEF.Alert.reset();
-        //WEF.wisepush.renderClearForm($('form#pubForm'));
-        //WEF.wisepush.renderClearForm($('form#subForm'));
         WEF.wisepush.connect();
     },
     /**
      * 최초 페이지 로딩 시 wisepush 서버 접속 처리 함수.
      */
     connect : function() {
-        var host = 'www.wiseeco.com', port = 8083, clientId = 'clientId-' + WEF.func.randomString(10);
+        var host = 'localhost', port = 8083, clientId = 'clientId-' + WEF.func.randomString(10);
         this.client = new Paho.MQTT.Client(host, port, clientId);
         this.client.onConnectionLost = this.onConnectionLost;
         this.client.onMessageArrived = this.onMessageArrived;
@@ -59,15 +56,7 @@ WEF.wisepush = {
         if (responseObject.errorCode !== 0) {
             console.log("onConnectionLost:" + responseObject.errorMessage);
         }
-        //WEF.Alert.error("STATE : disconnected.");
         WEF.wisepush.reconnect()
-        //this.client = null;
-        //Cleanup messages
-        //this.messages = [];
-        //WEF.wisepush.renderClearMessages();
-        //Cleanup subscriptions
-        //this.subscriptions = [];
-        //WEF.wisepush.renderClearSubscriptions();
     },
     /**
      * 메세지 수신 시 호출되는 콜백 함수.
@@ -95,7 +84,6 @@ WEF.wisepush = {
         console.log('wiseeco.com connection succeeded.');
         if (WEF.wisepush.subscriptions && WEF.wisepush.subscriptions.length > 0) {
             _.each(WEF.wisepush.subscriptions, function(ele, index) {
-                WEF.wisepush.subscriptions.splice(index, 1);
                 WEF.wisepush.subscribe(ele.topic);
             });
         }
@@ -126,16 +114,21 @@ WEF.wisepush = {
      */
     subscribe : function (topic) {
         if (!WEF.wisepush.connected) {
-            //WEF.Alert.error("STATE : disconnected.");
             console.log('disconnected.');
             return false;
         }
-        if (topic.length < 1) {
-            //WEF.Alert.error("Topic cannot be empty.");
+        if (!topic) {
             console.log('Topic cannot be empty.');
             return false;
         }
         this.client.subscribe(topic, {qos: 1});
+        var alreadyTopic = _.find(this.subscriptions, function(sub) {
+            return sub.topic == topic;
+        });
+        if (alreadyTopic) {
+            console.log('You are already subscribed to this topic.' + topic);
+            return false;
+        }
         var subscription = {'topic': topic, 'qos': 1};
         subscription.id = WEF.wisepush.renderSubscription(subscription);
         this.subscriptions.push(subscription);
@@ -145,11 +138,10 @@ WEF.wisepush = {
     /**
      * 메세지(토픽 포함) 구독 해제 요청.
      */
-    unsubscribe : function (id) {
-        var subs = _.find(WEF.wisepush.subscriptions, {'id': id});
-        this.client.unsubscribe(subs.topic);
+    unsubscribe : function (topic) {
+        this.client.unsubscribe(topic);
         WEF.wisepush.subscriptions = _.filter(WEF.wisepush.subscriptions, function (item) {
-            return item.id != id;
+            return item.topic != topic;
         });
         WEF.wisepush.renderRemoveSubscriptionsMessages(id);
     },
@@ -186,10 +178,6 @@ WEF.wisepush = {
         });
     },
     renderSubscription : function (subscription) {
-        //WEF.Alert.reset();
-        //WEF.Alert.success(subscription.topic + " 구독되었습니다.");
-        //WEF.wisepush.renderClearForm($('form#subForm'));
-        //WEF.wisepush.renderClearSubscriptions();
         return WEF.wisepush.lastSubId++;
     },
     renderRemoveSubscriptionsMessages : function (id) {
